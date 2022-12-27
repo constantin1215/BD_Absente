@@ -42,10 +42,12 @@ async function select(table) {
         connection = await pool.getConnection();
         console.log("Fetching...");
         let result;
-        if (table !== 'info')
-            result = await connection.execute(`SELECT * FROM ${table}`);
-        else
+        if (table === 'info')
             result = await connection.execute(`SELECT A.DATA_INREGISTRARII, A.MOTIVATA, S.NUME || ' ' || S.PRENUME AS "STUDENT", G.COD_GRUPA || G.SEMIGRUPA AS "SEMIGRUPA", S.EMAIL , L.ORA, M.DENUMIRE, P.NUME || ' ' || P.PRENUME AS "PROFESOR" FROM ABSENTA A, STUDENT S, LABORATOR L, MATERIE M, PROFESOR P, GRUPA G WHERE A.ID_STUDENT = S.ID_STUDENT AND A.ID_LAB = L.ID_LAB AND L.ID_MATERIE = M.ID_MATERIE AND L.ID_PROF = P.ID_PROF AND S.ID_GRUPA = G.ID_GRUPA`);
+        else if (table === "leg_not_null")
+            result = await connection.execute(`SELECT * FROM LEGITIMATIE WHERE ID_STUDENT IS NULL`);
+        else
+            result = await connection.execute(`SELECT * FROM ${table}`);
         console.log("Fetched");
 
 

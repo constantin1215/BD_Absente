@@ -6,19 +6,18 @@
 
 .tableWrap {
     grid-template-rows: 10% 1fr;
+    gap: 0;
 }
 
 .tableHead {
     background: hsl(216deg 100% 32%);
     color: white;
     border-radius: 1rem;
+    padding: 0 1rem;
 }
 
 .tableHead span {
-    padding: 1rem;
-    position: relative;
-    top: 40%;
-    transform: translateY(-50%);
+    align-self: center;
 }
 
 .tableBody {
@@ -28,3 +27,4 @@
 .row span {
     font-size: 1.5rem;
 }
+
