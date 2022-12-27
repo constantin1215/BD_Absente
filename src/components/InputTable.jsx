@@ -15,12 +15,6 @@ const InputTable = (props) => {
     const [nivel, setLevel] = useState('');
     const [nivele, setNivele] = useState();
 
-    const loadNivele = () => {
-        axios.post("http://localhost:8080/select", { tableName: "NIVEL_PROFESOR" })
-            .then(res => setNivele(res.data.content.rows.map(item => item = { value: item[0], label: item[1] })))
-            .catch(err => console.log(err));
-    }
-
     //MATERIE
 
     const [denumire, setDenumire] = useState('');
@@ -43,20 +37,7 @@ const InputTable = (props) => {
     const [grupa, setGrupa] = useState('');
 
     const [camereLibere, setCamere] = useState('');
-
-    const loadCamere = () => {
-        axios.post("http://localhost:8080/select", { tableName: "leg_not_null" })
-            .then(res => setCamere(res.data.content.rows.map(item => item = { value: item[0], label: item[1] + " " + item[2] })))
-            .catch(err => console.log(err));
-    }
-
     const [grupe, setGrupe] = useState('');
-
-    const loadGrupe = () => {
-        axios.post("http://localhost:8080/select", { tableName: "GRUPA" })
-            .then(res => setGrupe(res.data.content.rows.map(item => item = { value: item[0], label: item[0] })))
-            .catch(err => console.log(err));
-    }
 
     //LABORATOR
 
@@ -70,19 +51,6 @@ const InputTable = (props) => {
     const [materii, setMaterii] = useState('');
     const [profesori, setProfesori] = useState('');
 
-
-    const loadMaterii = () => {
-        axios.post("http://localhost:8080/select", { tableName: "MATERIE" })
-            .then(res => setMaterii(res.data.content.rows.map(item => item = { value: item[0], label: item[1] })))
-            .catch(err => console.log(err));
-    }
-
-    const loadProfesori = () => {
-        axios.post("http://localhost:8080/select", { tableName: "PROFESOR" })
-            .then(res => setProfesori(res.data.content.rows.map(item => item = { value: item[0], label: item[1] + " " + item[2] })))
-            .catch(err => console.log(err));
-    }
-
     //ABSENTA
 
     const [motivata, setMotivata] = useState('');
@@ -92,12 +60,6 @@ const InputTable = (props) => {
 
     const [studenti, setStudenti] = useState('');
     const [laboratoare, setLaboratoare] = useState('');
-
-    const loadStudenti = () => {
-        axios.post("http://localhost:8080/select", { tableName: "STUDENT" })
-            .then(res => setStudenti(res.data.content.rows.map(item => item = { value: item[0], label: item[1] + " " + item[2] })))
-            .catch(err => console.log(err));
-    }
 
     const loadLaboratoare = () => {
         axios.post("http://localhost:8080/select", { tableName: "LABORATOR" })
@@ -111,18 +73,26 @@ const InputTable = (props) => {
             .catch(err => console.log(err));
     }
 
+    const loadType2 = (table, setter, index1, index2) => {
+        axios.post("http://localhost:8080/select", { tableName: table })
+            .then(res => setter(res.data.content.rows.map(item => item = { value: item[0], label: item[index1] + " " + item[index2] })))
+            .catch(err => console.log(err));
+    }
+
     useEffect(() => {
-        loadNivele();
-        loadGrupe();
-        loadCamere();
-        
-        //loadType1("MATERIE", setMaterii, 1);
-        loadProfesori();
-        loadStudenti();
-        loadLaboratoare();
-        
-        loadMaterii();
+        loadType1("MATERIE", setMaterii, 1);
+        loadType1("GRUPA", setGrupe, 0);
+        loadType1("NIVEL_PROFESOR", setNivele, 1);
+        loadType2("leg_not_null", setCamere, 1, 2);
+        loadType2("PROFESOR", setProfesori, 1, 2);
+        loadType2("STUDENT", setStudenti, 1, 2);
     }, []);
+
+    useEffect(() => {
+        loadLaboratoare();        
+    }, [materii])
+
+    console.log(laboratoare)
 
     const renderCustomInput = (type) => {
         switch (type) {
