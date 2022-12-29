@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import inputStyles from "../modules/InputTable.module.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons';
 import Select from "react-select";
 import axios from "axios";
 
 const InputTable = (props) => {
+    const [reload, setReload] = useState(0);
+    const [thumb, setThumb] = useState(false);
+    const [gotError, setGotError] = useState(false);
+
     //LEGITIMATIE
     const [caminAles, setCaminAles] = useState({ value: "T1" });
     const [cameraAleasa, setCameraAleasa] = useState(300);
@@ -13,6 +19,7 @@ const InputTable = (props) => {
     const [prenumeP, setPrenume] = useState('');
     const [emailP, setEmail] = useState('');
     const [nivel, setLevel] = useState('');
+
     const [nivele, setNivele] = useState();
 
     //MATERIE
@@ -33,7 +40,7 @@ const InputTable = (props) => {
     const [emailS, setEmailS] = useState('');
     const [specializare, setSpecial] = useState('');
     const [credit, setCredit] = useState(0);
-    const [cazare, setCazare] = useState('');
+    const [cazare, setCazare] = useState(null);
     const [grupa, setGrupa] = useState('');
 
     const [camereLibere, setCamere] = useState('');
@@ -86,24 +93,22 @@ const InputTable = (props) => {
         loadType2("leg_not_null", setCamere, 1, 2);
         loadType2("PROFESOR", setProfesori, 1, 2);
         loadType2("STUDENT", setStudenti, 1, 2);
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
-        loadLaboratoare();        
+        loadLaboratoare();
     }, [materii])
-
-    console.log(laboratoare)
 
     const renderCustomInput = (type) => {
         switch (type) {
             case "ABSENTA":
                 let today = new Date();
                 const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
                 const yyyy = today.getFullYear();
 
-                today = mm + '/' + dd + '/' + yyyy;
-                const yesterday = (mm - 1) + '/' + dd + '/' + yyyy;
+                today = dd + '/' + mm + '/' + yyyy;
+                const yesterday = (dd - 1) + '/' + mm + '/' + yyyy;
 
                 const date = [{ label: "Astazi", value: today }, { label: "Ieri", value: yesterday }];
                 const status = [{ label: "DA", value: "DA" }, { label: "NU", value: "NU" }]
@@ -277,6 +282,80 @@ const InputTable = (props) => {
 
     const handleSubmit = e => {
         e.preventDefault();
+
+        let data;
+
+        switch (props.table) {
+            case "ABSENTA":
+                data = {
+                    motivata: motivata.value,
+                    inregistrare: inregistrare.value,
+                    student: student.value,
+                    lab: lab.value
+                }
+                console.log(data)
+                break
+            case "PROFESOR":
+                data = {
+                    nume: numeP.charAt(0).toUpperCase() + numeP.slice(1).toLocaleLowerCase(),
+                    prenume: prenumeP.charAt(0).toUpperCase() + prenumeP.slice(1).toLocaleLowerCase(),
+                    email: emailP,
+                    lvl: nivel.value
+                }
+                break
+            case "MATERIE":
+                data = {
+                    denumire: denumire,
+                    descriere: descriere,
+                    abreviere: abreviere
+                }
+                break
+            case "GRUPA":
+                data = {
+                    id: cod.value + an.value * 100 + semigrupa.value,
+                    cod: cod.value,
+                    an: an.value,
+                    semigrupa: semigrupa.value
+                }
+                break
+            case "LEGITIMATIE":
+                data = {
+                    camin: caminAles.value,
+                    camera: cameraAleasa.value
+                }
+                break
+            case "STUDENT":
+                data = {
+                    numeS: numeS.charAt(0).toUpperCase() + numeS.slice(1).toLocaleLowerCase(),
+                    prenumeS: prenumeS.charAt(0).toUpperCase() + prenumeS.slice(1).toLocaleLowerCase(),
+                    emailS: emailS,
+                    specializare: specializare.value,
+                    credite: credit.value,
+                    legitimatie: cazare === null ? null : cazare.value,
+                    grupa: grupa.value
+                }
+                break
+            case "LABORATOR":
+                data = {
+                    sala: sala.value,
+                    ora: ora.value,
+                    zi: zi.value,
+                    materie: materie.value,
+                    profesor: profesor.value,
+                    grupaLab: grupaLab.value
+                }
+                break
+            default:
+                data = 0;
+        }
+
+        axios.post("http://localhost:8080/input", { content: data, table: props.table })
+            .then(_ => setGotError(false))
+            .catch(_ => setGotError(true));
+
+        setReload(reload + 1);
+        setThumb(true);
+        setTimeout(() => { setThumb(false); setGotError(false); }, 2000);
     }
 
     return <div className={inputStyles.inputWrap}>
@@ -284,9 +363,13 @@ const InputTable = (props) => {
             <div className={inputStyles.input} style={{ gridTemplateColumns: `repeat(${props.metaData.length - 1}, 1fr)` }} >
                 {renderCustomInput(props.table)}
             </div>
-            <div style={{ textAlign: "center" }}>
-                <button type="submit" disabled={props.table === "NIVEL_PROFESOR" ? true : false} className={inputStyles.btn} onClick={() => console.log("click")}>Add entry</button>
+            <div style={{ textAlign: "center", margin: "1rem" }}>
+                <button type="submit" disabled={props.table === "NIVEL_PROFESOR" ? true : false} className={inputStyles.btn}>Add entry</button>
             </div>
+            {thumb ? <div style={{ textAlign: "center" }}>
+                <FontAwesomeIcon style={gotError ? { color: "red" } : { color: "green" }} icon={!gotError ? faThumbsUp : faThumbsDown} size={"3x"} />
+                <p style={gotError ? { color: "red" } : { color: "green" }}>{gotError ? "Eroare" : "OK!"}</p>
+            </div> : null}
         </form>
     </div>
 }

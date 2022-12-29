@@ -9,7 +9,6 @@
     gap: 2rem;
     flex-direction: column;
     margin: 0 auto;
-
 }
 
 .box * {
@@ -42,5 +41,15 @@
 
 .plus {
     color: green;
+    cursor: pointer;
+}
+
+.refresh {
+    color: cadetblue;
+    cursor: pointer;
+}
+
+.trash {
+    color: red;
     cursor: pointer;
 }

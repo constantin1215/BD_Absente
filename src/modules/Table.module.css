@@ -22,6 +22,8 @@
 
 .tableBody {
     gap: 0;
+    overflow-y: scroll;
+    height: 40vh;
 }
 
 .row span {

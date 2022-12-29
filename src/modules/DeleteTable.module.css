@@ -1,0 +1,27 @@
+.deleteWrap {
+    border: 3px solid red;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.btn {
+    border: 2px solid red;
+    border-radius: 1rem;
+    padding: 0.3rem;
+    width: 10vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: red;
+    color: white;
+}
+
